@@ -1,0 +1,6 @@
+bin/
+obj/
+.vs/
+.idea/
+Canals_Blender.csproj.user
+Canals_Blender.slnx
