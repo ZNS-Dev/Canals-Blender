@@ -1,4 +1,4 @@
-<h1>Canals Blender 1.1.0</h1>
+<h1>Canals Blender</h1>
 
 > \[!IMPORTANT]
 > The application may take some time depending on the texture resolution.
