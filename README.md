@@ -10,7 +10,7 @@
 > Drag the images into one of the square, wait for the application to complete the process, and click **Download**.
 
 <p align="center">
-<img width="566" height="423" alt="Capture d’écran 2026-11-10 140013" src="https://github.com/user-attachments/assets/2956acc5-4214-4c32-a534-543e781d03db" />
+<img width="566" height="522" alt="image" src="https://github.com/user-attachments/assets/192a28d0-615e-4460-b40a-49ae2d47e7bd" />
 
 ## Features & Improvements
 - Automatic Update
