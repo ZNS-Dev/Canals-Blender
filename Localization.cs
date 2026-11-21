@@ -26,7 +26,7 @@ namespace Canals_Blender
                 {
                     { "WindowTitle", "Canals Blender" },
                     { "BtnDownload", "Download" },
-                    { "BtnDelete", "Delete images" },
+                    { "BtnDelete", "Delete image" },
                     { "MsgErrorTitle", "Error" },
                     { "MsgNoImage", "Please drag and drop any image to download." },
                     { "MsgSaveError", "Save failed" },

@@ -89,13 +89,21 @@ namespace Canals_Blender
 
         private void ApplyTranslations(string lang)
         {
-            if (Localization.Translations.ContainsKey(lang))
-            {
-                var t = Localization.Translations[lang];
+            if (!Localization.Translations.TryGetValue(lang, out var t))
+                return;
 
-                if (t.ContainsKey("WindowTitle")) this.Text = t["WindowTitle"];
-                if (t.ContainsKey("BtnDownload")) Btn_Download.Text = t["BtnDownload"];
-                if (t.ContainsKey("BtnDelete")) Btn_Delete.Text = t["BtnDelete"];
+            if (t.TryGetValue("WindowTitle", out var windowTitle))
+                this.Text = windowTitle;
+
+            if (t.TryGetValue("BtnDownload", out var downloadText))
+                Btn_Download.Text = downloadText;
+
+            if (t.TryGetValue("BtnDelete", out var deleteText))
+            {
+                Btn_Delete_R.Text = deleteText;
+                Btn_Delete_B.Text = deleteText;
+                Btn_Delete_G.Text = deleteText;
+                Btn_Delete_RGB.Text = deleteText;
             }
         }
 
@@ -110,12 +118,6 @@ namespace Canals_Blender
         }
 
         // ================== Auto-Update ====================== //
-
-        private const string GitHubReleaseApiUrl =
-            "https://api.github.com/repos/ZNS-Dev/Canals-Blender/releases/latest";
-        private const string GitHubReleasePageUrl =
-            "https://github.com/ZNS-Dev/Canals-Blender/releases/latest";
-
         private string ExtractJsonValue(string json, string key)
         {
             Match match = Regex.Match(
@@ -137,72 +139,100 @@ namespace Canals_Blender
                 : null;
         }
 
-        private bool IsValidReleaseUrl(string url)
-        {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
-                return false;
-
-            const string releasePath = "/ZNS-Dev/Canals_Blender/releases";
-            return uri.Scheme == Uri.UriSchemeHttps
-                && uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
-                && (uri.AbsolutePath.Equals(releasePath, StringComparison.OrdinalIgnoreCase)
-                    || uri.AbsolutePath.StartsWith(releasePath + "/", StringComparison.OrdinalIgnoreCase));
-        }
-
         private async Task CheckForUpdatesAsync()
         {
             try
             {
-                Version localVersion = ExtractVersion(label1?.Text)
-                    ?? Assembly.GetExecutingAssembly().GetName().Version;
+                string localText = label1 != null ? label1.Text : "";
+                Version localVersion = ExtractVersion(localText);
 
-                if (localVersion == null)
-                    return;
+                if (localVersion == null) return;
 
                 ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 
                 using HttpClient client = new();
-                client.Timeout = TimeSpan.FromSeconds(10);
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("CanalsBlender");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("Canals Blender");
 
-                using HttpResponseMessage response = await client.GetAsync(GitHubReleaseApiUrl);
-                if (!response.IsSuccessStatusCode)
-                {
-                    Debug.WriteLine($"[Update] GitHub returned {(int)response.StatusCode}.");
-                    return;
-                }
+                string apiUrl = "https://api.github.com/repos/ZNS-Dev/Canals-Blender/releases/latest";
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                if (!response.IsSuccessStatusCode) return;
 
                 string json = await response.Content.ReadAsStringAsync();
+
                 string remoteTag = ExtractJsonValue(json, "tag_name");
                 string remoteName = ExtractJsonValue(json, "name");
+                string downloadUrl = ExtractExeUrlFromAssets(json);
+
                 Version remoteVersion = ExtractVersion(remoteTag) ?? ExtractVersion(remoteName);
 
-                if (remoteVersion == null || remoteVersion <= localVersion)
-                    return;
+                if (remoteVersion == null) return;
 
-                string releaseUrl = ExtractJsonValue(json, "html_url");
-                if (!IsValidReleaseUrl(releaseUrl))
-                    releaseUrl = GitHubReleasePageUrl;
-
-                MessageBox.Show(
-                    this,
-                    $"Une nouvelle version de Canals Blender est disponible.\n\n" +
-                    $"Version actuelle : {localVersion}\n" +
-                    $"Nouvelle version : {remoteVersion}\n\n" +
-                    "La page de téléchargement va s'ouvrir dans votre navigateur.",
-                    "Mise à jour disponible",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                Process.Start(new ProcessStartInfo
+                if (remoteVersion > localVersion)
                 {
-                    FileName = releaseUrl,
-                    UseShellExecute = true
-                });
+
+                    DialogResult dialog = MessageBox.Show(
+                        $"A new version is available!\n\n" +
+                        $"• Current version: {localVersion}\n" +
+                        $"• New version: {remoteVersion}\n\n" +
+                        $"Would you like to download it and restart the application?",
+                        "Update Available",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question
+                    );
+
+                    if (dialog == DialogResult.Yes)
+                    {
+                        if (string.IsNullOrEmpty(downloadUrl))
+                        {
+                            MessageBox.Show("Error: No .exe file was found in the Release.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        await ReplaceAndRestartAsync(client, downloadUrl);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[Update Error] {ex.Message}");
             }
+        }
+
+        private async Task ReplaceAndRestartAsync(HttpClient client, string downloadUrl)
+        {
+            try
+            {
+                string currentExePath = Application.ExecutablePath;
+                string tempExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "update_temp.exe");
+
+                byte[] exeData = await client.GetByteArrayAsync(downloadUrl);
+                File.WriteAllBytes(tempExePath, exeData);
+
+                string cmdArgs = $"/c timeout /t 2 /nobreak > nul & move /y \"{tempExePath}\" \"{currentExePath}\" & start \"\" \"{currentExePath}\"";
+
+                ProcessStartInfo psi = new()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdArgs,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    UseShellExecute = true
+                };
+
+                Process.Start(psi);
+                Application.Exit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to update application: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string ExtractExeUrlFromAssets(string json)
+        {
+            Match match = Regex.Match(json, @"\""browser_download_url\""\s*:\s*\""([^\""]+\.exe)\""", RegexOptions.IgnoreCase);
+            return match.Success ? match.Groups[1].Value : null;
         }
 
         // ======================================================== //
@@ -212,11 +242,7 @@ namespace Canals_Blender
     Bitmap greenImage,
     Bitmap blueImage)
         {
-            Bitmap reference = redImage ?? greenImage ?? blueImage;
-
-            if (reference == null)
-                throw new InvalidOperationException("No image loaded.");
-
+            Bitmap reference = (redImage ?? greenImage ?? blueImage) ?? throw new InvalidOperationException("No image loaded.");
             int width = reference.Width;
             int height = reference.Height;
 
@@ -229,7 +255,7 @@ namespace Canals_Blender
                     "All RGB images must have the same dimensions.");
             }
 
-            Bitmap result = new Bitmap(width, height);
+            Bitmap result = new(width, height);
 
             try
             {
@@ -256,6 +282,36 @@ namespace Canals_Blender
                 result.Dispose();
                 throw;
             }
+        }
+
+        private async Task RecompilePackageImageAsync()
+        {
+            if (R_Picture.Image == null &&
+                G_Picture.Image == null &&
+                B_Picture.Image == null)
+            {
+                Image oldImage = T_Package.Image;
+                T_Package.Image = null;
+                oldImage?.Dispose();
+                return;
+            }
+
+            using Bitmap red = R_Picture.Image != null
+                ? new Bitmap(R_Picture.Image) : null;
+
+            using Bitmap green = G_Picture.Image != null
+                ? new Bitmap(G_Picture.Image) : null;
+
+            using Bitmap blue = B_Picture.Image != null
+                ? new Bitmap(B_Picture.Image) : null;
+
+            Bitmap result = await Task.Run(
+                () => CompileCanals(red, green, blue)
+            );
+
+            Image previousImage = T_Package.Image;
+            T_Package.Image = result;
+            previousImage?.Dispose();
         }
 
         private void DecompileCanals()
@@ -365,10 +421,7 @@ namespace Canals_Blender
                 if (e.Data == null ||
                     !e.Data.GetDataPresent(DataFormats.FileDrop))
                     return;
-
-                string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
-
-                if (files == null || files.Length == 0)
+                if (e.Data.GetData(DataFormats.FileDrop) is not string[] files || files.Length == 0)
                     return;
 
                 string filePath = files[0];
@@ -418,12 +471,12 @@ namespace Canals_Blender
                     // Process images on a background thread
                     Bitmap result = await Task.Run(
                         () => CompileCanals(red, green, blue)
-                    );
+                            );
 
                     // Update the PictureBox on the UI thread
-                    Image oldPackage = T_Package.Image;
+                    Image oldImage = T_Package.Image;
                     T_Package.Image = result;
-                    oldPackage?.Dispose();
+                    oldImage?.Dispose();
                 }
                 else
                 {
@@ -467,9 +520,30 @@ namespace Canals_Blender
         private void Btn_Delete_Click(object sender, EventArgs e)
         {
             T_Package.Image?.Dispose(); T_Package.Image = null;
-            R_Picture.Image?.Dispose(); R_Picture.Image = null;
-            G_Picture.Image?.Dispose(); G_Picture.Image = null;
-            B_Picture.Image?.Dispose(); B_Picture.Image = null;
+        }
+
+        private async void Btn_Delete_R_Click(object sender, EventArgs e)
+        {
+            R_Picture.Image?.Dispose();
+            R_Picture.Image = null;
+
+            await RecompilePackageImageAsync();
+        }
+
+        private async void Btn_Delete_G_Click(object sender, EventArgs e)
+        {
+            G_Picture.Image?.Dispose();
+            G_Picture.Image = null;
+
+            await RecompilePackageImageAsync();
+        }
+
+        private async void Btn_Delete_B_Click(object sender, EventArgs e)
+        {
+            B_Picture.Image?.Dispose();
+            B_Picture.Image = null;
+
+            await RecompilePackageImageAsync();
         }
     }
 }

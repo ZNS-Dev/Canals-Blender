@@ -34,10 +34,13 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.panel6 = new System.Windows.Forms.Panel();
             this.T_Package = new System.Windows.Forms.PictureBox();
-            this.Btn_Delete = new System.Windows.Forms.Button();
+            this.Btn_Delete_G = new System.Windows.Forms.Button();
             this.Btn_Download = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.Btn_Delete_R = new System.Windows.Forms.Button();
+            this.Btn_Delete_B = new System.Windows.Forms.Button();
+            this.Btn_Delete_RGB = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.R_Picture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.G_Picture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.B_Picture)).BeginInit();
@@ -116,7 +119,7 @@
             this.P_RGB.Controls.Add(this.panel4);
             this.P_RGB.Controls.Add(this.panel6);
             this.P_RGB.Enabled = false;
-            this.P_RGB.Location = new System.Drawing.Point(192, 198);
+            this.P_RGB.Location = new System.Drawing.Point(192, 239);
             this.P_RGB.Name = "P_RGB";
             this.P_RGB.Size = new System.Drawing.Size(175, 175);
             this.P_RGB.TabIndex = 0;
@@ -142,33 +145,33 @@
             // T_Package
             // 
             this.T_Package.BackColor = System.Drawing.Color.Black;
-            this.T_Package.Location = new System.Drawing.Point(193, 199);
+            this.T_Package.Location = new System.Drawing.Point(193, 240);
             this.T_Package.Name = "T_Package";
             this.T_Package.Size = new System.Drawing.Size(173, 173);
             this.T_Package.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.T_Package.TabIndex = 0;
             this.T_Package.TabStop = false;
             // 
-            // Btn_Delete
+            // Btn_Delete_G
             // 
-            this.Btn_Delete.AutoSize = true;
-            this.Btn_Delete.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.Btn_Delete.ForeColor = System.Drawing.Color.White;
-            this.Btn_Delete.Location = new System.Drawing.Point(12, 230);
-            this.Btn_Delete.Name = "Btn_Delete";
-            this.Btn_Delete.Size = new System.Drawing.Size(95, 25);
-            this.Btn_Delete.TabIndex = 17;
-            this.Btn_Delete.Text = "Delete images";
-            this.Btn_Delete.UseVisualStyleBackColor = true;
-            this.Btn_Delete.Click += new System.EventHandler(this.Btn_Delete_Click);
+            this.Btn_Delete_G.AutoSize = true;
+            this.Btn_Delete_G.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.Btn_Delete_G.ForeColor = System.Drawing.Color.White;
+            this.Btn_Delete_G.Location = new System.Drawing.Point(192, 199);
+            this.Btn_Delete_G.Name = "Btn_Delete_G";
+            this.Btn_Delete_G.Size = new System.Drawing.Size(174, 25);
+            this.Btn_Delete_G.TabIndex = 17;
+            this.Btn_Delete_G.Text = "Delete image";
+            this.Btn_Delete_G.UseVisualStyleBackColor = true;
+            this.Btn_Delete_G.Click += new System.EventHandler(this.Btn_Delete_G_Click);
             // 
             // Btn_Download
             // 
             this.Btn_Download.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.Btn_Download.ForeColor = System.Drawing.Color.White;
-            this.Btn_Download.Location = new System.Drawing.Point(12, 199);
+            this.Btn_Download.Location = new System.Drawing.Point(192, 420);
             this.Btn_Download.Name = "Btn_Download";
-            this.Btn_Download.Size = new System.Drawing.Size(95, 25);
+            this.Btn_Download.Size = new System.Drawing.Size(175, 25);
             this.Btn_Download.TabIndex = 16;
             this.Btn_Download.Text = "Download";
             this.Btn_Download.UseVisualStyleBackColor = true;
@@ -179,11 +182,11 @@
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.ForeColor = System.Drawing.SystemColors.Window;
-            this.label1.Location = new System.Drawing.Point(515, 367);
+            this.label1.Location = new System.Drawing.Point(515, 466);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(37, 13);
             this.label1.TabIndex = 18;
-            this.label1.Text = "v1.1.0";
+            this.label1.Text = "v1.2.0";
             // 
             // comboBox1
             // 
@@ -192,18 +195,59 @@
             "Français",
             "English",
             "Español"});
-            this.comboBox1.Location = new System.Drawing.Point(13, 261);
+            this.comboBox1.Location = new System.Drawing.Point(14, 240);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(173, 21);
             this.comboBox1.TabIndex = 19;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
+            // 
+            // Btn_Delete_R
+            // 
+            this.Btn_Delete_R.AutoSize = true;
+            this.Btn_Delete_R.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.Btn_Delete_R.ForeColor = System.Drawing.Color.White;
+            this.Btn_Delete_R.Location = new System.Drawing.Point(13, 199);
+            this.Btn_Delete_R.Name = "Btn_Delete_R";
+            this.Btn_Delete_R.Size = new System.Drawing.Size(174, 25);
+            this.Btn_Delete_R.TabIndex = 20;
+            this.Btn_Delete_R.Text = "Delete image";
+            this.Btn_Delete_R.UseVisualStyleBackColor = true;
+            this.Btn_Delete_R.Click += new System.EventHandler(this.Btn_Delete_R_Click);
+            // 
+            // Btn_Delete_B
+            // 
+            this.Btn_Delete_B.AutoSize = true;
+            this.Btn_Delete_B.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.Btn_Delete_B.ForeColor = System.Drawing.Color.White;
+            this.Btn_Delete_B.Location = new System.Drawing.Point(374, 199);
+            this.Btn_Delete_B.Name = "Btn_Delete_B";
+            this.Btn_Delete_B.Size = new System.Drawing.Size(174, 25);
+            this.Btn_Delete_B.TabIndex = 21;
+            this.Btn_Delete_B.Text = "Delete image";
+            this.Btn_Delete_B.UseVisualStyleBackColor = true;
+            this.Btn_Delete_B.Click += new System.EventHandler(this.Btn_Delete_B_Click);
+            // 
+            // Btn_Delete_RGB
+            // 
+            this.Btn_Delete_RGB.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.Btn_Delete_RGB.ForeColor = System.Drawing.Color.White;
+            this.Btn_Delete_RGB.Location = new System.Drawing.Point(192, 451);
+            this.Btn_Delete_RGB.Name = "Btn_Delete_RGB";
+            this.Btn_Delete_RGB.Size = new System.Drawing.Size(175, 25);
+            this.Btn_Delete_RGB.TabIndex = 22;
+            this.Btn_Delete_RGB.Text = "Delete image";
+            this.Btn_Delete_RGB.UseVisualStyleBackColor = true;
+            this.Btn_Delete_RGB.Click += new System.EventHandler(this.Btn_Delete_Click);
             // 
             // Canals_Blender
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(564, 389);
+            this.ClientSize = new System.Drawing.Size(564, 488);
+            this.Controls.Add(this.Btn_Delete_RGB);
+            this.Controls.Add(this.Btn_Delete_B);
+            this.Controls.Add(this.Btn_Delete_R);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.T_Package);
@@ -214,7 +258,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.P_B);
             this.Controls.Add(this.P_RGB);
-            this.Controls.Add(this.Btn_Delete);
+            this.Controls.Add(this.Btn_Delete_G);
             this.Controls.Add(this.Btn_Download);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -244,9 +288,12 @@
         private System.Windows.Forms.PictureBox T_Package;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Panel panel6;
-        private System.Windows.Forms.Button Btn_Delete;
+        private System.Windows.Forms.Button Btn_Delete_G;
         private System.Windows.Forms.Button Btn_Download;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button Btn_Delete_R;
+        private System.Windows.Forms.Button Btn_Delete_B;
+        private System.Windows.Forms.Button Btn_Delete_RGB;
     }
 }
